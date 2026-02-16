@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 export default function Hero() {
   return (
-    <section 
+    <section
       className="relative min-h-screen flex items-center justify-center bg-cover bg-center"
       style={{
         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://readdy.ai/api/search-image?query=Modern%20professional%203D%20printing%20workshop%20with%20elegant%20resin%203D%20printer%2C%20detailed%20miniature%20figures%20on%20display%2C%20clean%20minimalist%20industrial%20design%2C%20soft%20ambient%20lighting%2C%20high-tech%20manufacturing%20equipment%2C%20premium%20quality%20craftsmanship%20environment%2C%20contemporary%20workspace%20aesthetic&width=1920&height=1080&seq=hero-bg-001&orientation=landscape')`
@@ -18,9 +18,9 @@ export default function Hero() {
           <div className="text-white space-y-6 sm:space-y-8 lg:col-span-1">
             {/* Logo centrado y levitando */}
             <div className="flex justify-center mb-6 sm:mb-8">
-              <div 
+              <div
                 className="h-48 w-48 sm:h-64 sm:w-64 animate-bounce"
-                style={{ 
+                style={{
                   animation: 'float 6s ease-in-out infinite',
                   animationDelay: '0s'
                 }}
@@ -29,17 +29,17 @@ export default function Hero() {
                 }}
               />
             </div>
-            
+
             {/* Título centrado */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-center">
               InfiniteCraft.Studio
             </h1>
-            
+
             {/* Subtítulo centrado */}
             <p className="text-lg sm:text-xl lg:text-2xl text-gray-100 leading-relaxed text-center px-2">
               Transforma tus ideas en figuras 3D de resina únicas
             </p>
-            
+
             {/* Frases inspiradoras - solo en desktop */}
             <div className="space-y-4 hidden lg:block">
               <blockquote className="text-lg italic text-gray-200 border-l-4 border-red-500 pl-4">
@@ -49,7 +49,7 @@ export default function Hero() {
                 Atrévete a materializar lo imposible
               </blockquote>
             </div>
-            
+
             {/* Botón centrado */}
             <div className="flex justify-center pt-4">
               <Link href="/personalizacion">
@@ -59,15 +59,42 @@ export default function Hero() {
               </Link>
             </div>
           </div>
-          
+
           {/* Imagen - solo visible en desktop */}
           <div className="hidden lg:flex justify-center">
-            <img 
+            <img
               src="https://readdy.ai/api/search-image?query=Collection%20of%20premium%20detailed%203D%20printed%20resin%20figures%20showcasing%20various%20characters%20and%20miniatures%2C%20professional%20photography%2C%20clean%20white%20background%2C%20high%20quality%20craftsmanship%2C%20intricate%20details%20visible%2C%20modern%20display%20arrangement%2C%20artistic%20lighting&width=600&height=600&seq=hero-figures-001&orientation=squarish"
               alt="Figuras 3D personalizadas"
               className="w-full max-w-md mx-auto rounded-2xl shadow-2xl object-top"
             />
           </div>
+        </div>
+      </div>
+
+
+      {/* Flecha flotante hacia abajo */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer z-10"
+        onClick={() => {
+          const catalogSection = document.getElementById('catalogo');
+          if (catalogSection) {
+            catalogSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}>
+        <div
+          className="text-white hover:text-red-500 transition-colors duration-300"
+          style={{
+            animation: 'float 2s ease-in-out infinite'
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-10 w-10 sm:h-12 sm:w-12"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
         </div>
       </div>
 
@@ -81,6 +108,6 @@ export default function Hero() {
           }
         }
       `}</style>
-    </section>
+    </section >
   );
 }

@@ -183,7 +183,7 @@ export default function PersonalizacionPage() {
 
       {/* Header */}
       <section className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-[15px] pb-[15px]">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex-1">
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Figura Personalizada</h1>
@@ -199,10 +199,10 @@ export default function PersonalizacionPage() {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-2 sm:pt-2 pb-4 sm:pb-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-[15px] pb-[7.5px]">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
           {/* Columna 1 - Subida de archivos */}
-          <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+          <div className="bg-white rounded-xl shadow-lg px-6 sm:px-8 py-[15px]">
             {/* Campo nombre de la figura */}
             <div className="mb-6 sm:mb-8">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Información de la Figura</h2>
@@ -313,7 +313,7 @@ export default function PersonalizacionPage() {
           </div>
 
           {/* Columna 2 - Calculadora de precios */}
-          <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+          <div className="bg-white rounded-xl shadow-lg px-6 sm:px-8 py-[15px]">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Configuración y Precio</h2>
 
             {/* Selector de tamaño con Slider */}

@@ -81,8 +81,8 @@ export default function Customization() {
 
             <div
               className={`border-2 border-dashed rounded-xl p-6 text-center transition-all duration-300 ${isDragOver
-                  ? 'border-red-500 bg-red-50'
-                  : 'border-gray-300 hover:border-red-400 bg-gray-50'
+                ? 'border-red-500 bg-red-50'
+                : 'border-gray-300 hover:border-red-400 bg-gray-50'
                 }`}
               onDrop={handleDrop}
               onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
@@ -151,8 +151,8 @@ export default function Customization() {
                       key={item.size}
                       onClick={() => setSelectedSize(item.size)}
                       className={`p-3 rounded-lg border-2 transition-all cursor-pointer whitespace-nowrap ${selectedSize === item.size
-                          ? 'border-red-500 bg-red-50 text-red-700'
-                          : 'border-gray-200 hover:border-red-300'
+                        ? 'border-red-500 bg-red-50 text-red-700'
+                        : 'border-gray-200 hover:border-red-300'
                         }`}
                     >
                       <div className="font-semibold">{item.size}</div>
@@ -175,8 +175,8 @@ export default function Customization() {
                       key={finish}
                       onClick={() => setSelectedFinish(finish)}
                       className={`p-3 rounded-lg border-2 transition-all cursor-pointer whitespace-nowrap ${selectedFinish === finish
-                          ? 'border-red-500 bg-red-50 text-red-700'
-                          : 'border-gray-200 hover:border-red-300'
+                        ? 'border-red-500 bg-red-50 text-red-700'
+                        : 'border-gray-200 hover:border-red-300'
                         }`}
                     >
                       {finish}
