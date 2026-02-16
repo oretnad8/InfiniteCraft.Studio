@@ -67,24 +67,23 @@ export default function Customization() {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">PERSONALIZACIÓN</h2>
-          <p className="text-xl text-gray-600">Configura tu figura perfecta</p>
+    <section className="py-10 bg-gradient-to-br from-gray-50 to-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">PERSONALIZACIÓN</h2>
+          <p className="text-lg sm:text-xl text-gray-600">Configura tu figura perfecta</p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="grid lg:grid-cols-2 gap-8">
           {/* Columna 1 - Subida de archivos */}
-          <div className="space-y-6">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Subida de Referencias</h3>
+          <div className="space-y-4">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Subida de Referencias</h3>
 
             <div
-              className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 ${
-                isDragOver
+              className={`border-2 border-dashed rounded-xl p-6 text-center transition-all duration-300 ${isDragOver
                   ? 'border-red-500 bg-red-50'
                   : 'border-gray-300 hover:border-red-400 bg-gray-50'
-              }`}
+                }`}
               onDrop={handleDrop}
               onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
               onDragLeave={() => setIsDragOver(false)}
@@ -137,10 +136,10 @@ export default function Customization() {
           </div>
 
           {/* Columna 2 - Calculadora de precios */}
-          <div className="space-y-6">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Calculadora de Precios</h3>
+          <div className="space-y-4">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Calculadora de Precios</h3>
 
-            <div className="bg-white rounded-xl p-6 shadow-lg">
+            <div className="bg-white rounded-xl p-4 sm:p-5 shadow-lg">
               {/* Selector de tamaño */}
               <div className="mb-6">
                 <label className="block text-lg font-semibold text-gray-700 mb-3">
@@ -151,11 +150,10 @@ export default function Customization() {
                     <button
                       key={item.size}
                       onClick={() => setSelectedSize(item.size)}
-                      className={`p-3 rounded-lg border-2 transition-all cursor-pointer whitespace-nowrap ${
-                        selectedSize === item.size
+                      className={`p-3 rounded-lg border-2 transition-all cursor-pointer whitespace-nowrap ${selectedSize === item.size
                           ? 'border-red-500 bg-red-50 text-red-700'
                           : 'border-gray-200 hover:border-red-300'
-                      }`}
+                        }`}
                     >
                       <div className="font-semibold">{item.size}</div>
                       <div className="text-sm text-gray-600">
@@ -176,11 +174,10 @@ export default function Customization() {
                     <button
                       key={finish}
                       onClick={() => setSelectedFinish(finish)}
-                      className={`p-3 rounded-lg border-2 transition-all cursor-pointer whitespace-nowrap ${
-                        selectedFinish === finish
+                      className={`p-3 rounded-lg border-2 transition-all cursor-pointer whitespace-nowrap ${selectedFinish === finish
                           ? 'border-red-500 bg-red-50 text-red-700'
                           : 'border-gray-200 hover:border-red-300'
-                      }`}
+                        }`}
                     >
                       {finish}
                       {finish === 'Pintado a mano' && (
@@ -192,16 +189,16 @@ export default function Customization() {
               </div>
 
               {/* Precio final */}
-              <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-xl p-6 mb-6">
+              <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-xl p-4 sm:p-5 mb-4">
                 <div className="text-center">
-                  <p className="text-lg text-gray-600 mb-2">Precio Total</p>
-                  <p className="text-4xl font-bold text-red-600">
+                  <p className="text-base text-gray-600 mb-1">Precio Total</p>
+                  <p className="text-3xl sm:text-4xl font-bold text-red-600">
                     ${calculatePrice().toLocaleString()} CLP
                   </p>
                 </div>
               </div>
 
-              <p className="text-sm text-gray-500 mb-6 text-center">
+              <p className="text-xs text-gray-500 mb-4 text-center">
                 * La complejidad se evaluará tras tu solicitud
               </p>
 
