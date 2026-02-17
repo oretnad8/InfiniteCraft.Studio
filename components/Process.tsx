@@ -1,6 +1,8 @@
 
 'use client';
 
+import { useState } from 'react';
+
 const processSteps = [
   {
     step: 1,
@@ -12,7 +14,7 @@ const processSteps = [
     step: 2,
     title: "Modelado 3D profesional (Blender + Shapr3D)",
     description: "Creamos el modelo digital con precisión milimétrica usando software profesional",
-    icon: "ri-3d-model-line"
+    icon: "ri-box-3-line" // Icono de cubo 3D
   },
   {
     step: 3,
@@ -53,6 +55,7 @@ const processSteps = [
 ];
 
 export default function Process() {
+  const [hoveredStep, setHoveredStep] = useState<number | null>(null);
   return (
     <section className="py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
       <div className="max-w-7xl mx-auto px-6">
@@ -65,18 +68,20 @@ export default function Process() {
           {processSteps.map((step, index) => (
             <div
               key={index}
-              className="relative bg-gray-800 rounded-xl p-6 hover:bg-gray-700 transition-all duration-300 transform hover:-translate-y-2"
+              className={`relative bg-gray-800 rounded-xl p-6 transition-all duration-300 transform hover:-translate-y-2 cursor-default ${hoveredStep === index ? 'bg-gray-700 shadow-xl' : ''}`}
+              onMouseEnter={() => setHoveredStep(index)}
+              onMouseLeave={() => setHoveredStep(null)}
             >
               {/* Número del paso */}
               <div className="absolute -top-4 left-6 bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
                 {step.step}
               </div>
-              
+
               {/* Icono */}
               <div className="w-12 h-12 bg-red-600/20 rounded-lg flex items-center justify-center mb-4 mt-2">
                 <i className={`${step.icon} text-2xl text-red-400`}></i>
               </div>
-              
+
               {/* Contenido */}
               <h3 className="text-lg font-bold mb-3 text-white leading-tight">
                 {step.title}
@@ -91,11 +96,14 @@ export default function Process() {
         {/* Línea de proceso visual */}
         <div className="mt-16 relative">
           <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 transform -translate-y-1/2 hidden lg:block"></div>
-          <div className="flex justify-between items-center relative z-10">
+          <div className="flex justify-between items-center relative z-10 h-8">
             {processSteps.map((_, index) => (
               <div
                 key={index}
-                className="w-4 h-4 bg-red-600 rounded-full border-4 border-gray-900 hidden lg:block"
+                className={`rounded-full border-4 border-gray-900 transition-all duration-500 ease-out ${hoveredStep === index
+                  ? 'w-8 h-8 bg-red-500 scale-125 shadow-[0_0_15px_rgba(239,68,68,0.6)]'
+                  : 'w-4 h-4 bg-red-700'
+                  }`}
               ></div>
             ))}
           </div>

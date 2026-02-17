@@ -26,7 +26,11 @@ const Category = require('./models/Category');
 // GET /products
 app.get('/products', async (req, res) => {
     try {
-        const products = await Product.find();
+        const query = {};
+        if (req.query.category) {
+            query.category = req.query.category;
+        }
+        const products = await Product.find(query);
         res.json(products);
     } catch (error) {
         res.status(500).json({ message: error.message });

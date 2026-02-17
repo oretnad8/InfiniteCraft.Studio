@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Hero from '../components/Hero';
 import Catalog from '../components/Catalog';
-import Gallery from '../components/Gallery';
+
 import Process from '../components/Process';
 import Footer from '../components/Footer';
 import Link from 'next/link';
@@ -13,7 +13,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <Hero />
       <Catalog />
-      <Gallery />
+
       <Process />
       <Footer />
       {/* Botón CTA */}

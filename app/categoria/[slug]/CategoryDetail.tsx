@@ -1,472 +1,142 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '../../../hooks/useCart';
 
-const categoryData = {
+// Hardcoded hero images for categories (fallback or enhancement)
+const categoryHeroImages: Record<string, string> = {
+  personajes: 'https://readdy.ai/api/search-image?query=Professional%20display%20of%20detailed%203D%20printed%20character%20figures%20including%20anime%20heroes%2C%20superheroes%2C%20and%20action%20figures%2C%20premium%20resin%20quality%2C%20dramatic%20lighting%2C%20collector%20showcase%2C%20museum%20quality%20presentation&width=1200&height=600&seq=hero-personajes-001&orientation=landscape',
+  mascotas: 'https://readdy.ai/api/search-image?query=Heartwarming%20collection%20of%20custom%203D%20printed%20pet%20figurines%2C%20dogs%20and%20cats%20in%20various%20poses%2C%20realistic%20details%2C%20memorial%20quality%2C%20emotional%20connection%2C%20professional%20pet%20photography%20style&width=1200&height=600&seq=hero-mascotas-001&orientation=landscape',
+  gaming: 'https://readdy.ai/api/search-image?query=Epic%20gaming%20character%20figures%20collection%2C%20video%20game%20heroes%2C%20detailed%203D%20printed%20miniatures%2C%20gaming%20culture%20showcase%2C%20collector%20quality%2C%20dramatic%20lighting%2C%20modern%20gaming%20aesthetic&width=1200&height=600&seq=hero-gaming-001&orientation=landscape',
+  marcos: 'https://readdy.ai/api/search-image?query=Elegant%20collection%20of%20custom%203D%20printed%20decorative%20frames%20with%20intricate%20patterns%20and%20designs%2C%20modern%20home%20decor%2C%20sophisticated%20craftsmanship%2C%20premium%20quality%20finish%2C%20artistic%20display&width=1200&height=600&seq=hero-marcos-001&orientation=landscape',
+  vehiculos: 'https://readdy.ai/api/search-image?query=Professional%20display%20of%20detailed%203D%20printed%20scale%20model%20vehicles%2C%20classic%20cars%2C%20sports%20cars%2C%20and%20motorcycles%2C%20collector%20quality%2C%20precision%20engineering%2C%20automotive%20miniatures%20showcase&width=1200&height=600&seq=hero-vehiculos-001&orientation=landscape',
+  maqueteria: 'https://readdy.ai/api/search-image?query=Professional%20architectural%20scale%20models%20and%20building%20miniatures%2C%20detailed%20construction%20replicas%2C%20precision%20crafted%20structures%2C%20modern%20and%20classic%20architecture%20showcase&width=1200&height=600&seq=hero-maqueteria-001&orientation=landscape',
+  lamparas: 'https://readdy.ai/api/search-image?query=Collection%20of%20custom%203D%20printed%20artistic%20lamps%20and%20lighting%20fixtures%2C%20modern%20design%2C%20creative%20illumination%2C%20contemporary%20home%20decor%2C%20elegant%20lighting%20solutions&width=1200&height=600&seq=hero-lamparas-001&orientation=landscape',
+  prototipos: 'https://readdy.ai/api/search-image?query=Professional%203D%20printed%20prototypes%20and%20product%20development%20models%2C%20engineering%20precision%2C%20industrial%20design%2C%20technical%20accuracy%2C%20modern%20manufacturing%20showcase&width=1200&height=600&seq=hero-prototipos-001&orientation=landscape'
+};
+
+// Hardcoded dictionary just for extra category metadata if not in API (like heroImage fallback)
+const categoryMetadata: Record<string, { heroImage: string, emoji: string, title?: string, description?: string }> = {
   personajes: {
-    title: 'Personajes',
     emoji: '🎭',
-    description: 'Figuras de acción, anime, superhéroes y personajes icónicos',
-    heroImage: 'https://readdy.ai/api/search-image?query=Professional%20display%20of%20detailed%203D%20printed%20character%20figures%20including%20anime%20heroes%2C%20superheroes%2C%20and%20action%20figures%2C%20premium%20resin%20quality%2C%20dramatic%20lighting%2C%20collector%20showcase%2C%20museum%20quality%20presentation&width=1200&height=600&seq=hero-personajes-001&orientation=landscape',
-    products: [
-      {
-        id: 1,
-        name: 'Goku Ultra Instinto',
-        basePrice: 25000,
-        image: 'https://readdy.ai/api/search-image?query=Detailed%203D%20printed%20Goku%20Ultra%20Instinto%20figure%2C%20silver%20hair%2C%20dynamic%20pose%2C%20premium%20resin%20finish%2C%20professional%20lighting%2C%20collector%20quality%2C%20anime%20figure&width=400&height=400&seq=prod-goku-001&orientation=squarish',
-        sizes: [
-          { size: '5cm', price: 20000 },
-          { size: '10cm', price: 25000 },
-          { size: '15cm', price: 30000 },
-          { size: '20cm', price: 35000 },
-          { size: '25cm', price: 40000 }
-        ],
-        complexity: 'Alta',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 2,
-        name: 'Spider-Man Miles Morales',
-        basePrice: 28000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20Miles%20Morales%20Spider-Man%20figure%2C%20black%20and%20red%20suit%2C%20dynamic%20web-swinging%20pose%2C%20detailed%20costume%20texture%2C%20superhero%20collectible&width=400&height=400&seq=prod-miles-001&orientation=squarish',
-        sizes: [
-          { size: '5cm', price: 23000 },
-          { size: '10cm', price: 28000 },
-          { size: '15cm', price: 33000 },
-          { size: '20cm', price: 38000 },
-          { size: '25cm', price: 43000 }
-        ],
-        complexity: 'Alta',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 3,
-        name: 'Naruto Hokage',
-        basePrice: 22000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20Naruto%20Hokage%20figure%2C%20orange%20outfit%2C%20confident%20pose%2C%20detailed%20facial%20features%2C%20anime%20collectible%2C%20premium%20resin%20quality&width=400&height=400&seq=prod-naruto-001&orientation=squarish',
-        sizes: [
-          { size: '5cm', price: 18000 },
-          { size: '10cm', price: 22000 },
-          { size: '15cm', price: 27000 },
-          { size: '20cm', price: 32000 },
-          { size: '25cm', price: 37000 }
-        ],
-        complexity: 'Media',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 4,
-        name: 'Wonder Woman',
-        basePrice: 26000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20Wonder%20Woman%20figure%2C%20golden%20armor%2C%20heroic%20pose%2C%20detailed%20costume%2C%20DC%20Comics%20collectible%2C%20professional%20quality%20finish&width=400&height=400&seq=prod-wonder-001&orientation=squarish',
-        sizes: [
-          { size: '5cm', price: 21000 },
-          { size: '10cm', price: 26000 },
-          { size: '15cm', price: 31000 },
-          { size: '20cm', price: 36000 },
-          { size: '25cm', price: 41000 }
-        ],
-        complexity: 'Alta',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 5,
-        name: 'Vegeta Super Saiyan Blue',
-        basePrice: 24000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20Vegeta%20Super%20Saiyan%20Blue%20figure%2C%20blue%20hair%2C%20battle%20stance%2C%20detailed%20muscle%20definition%2C%20Dragon%20Ball%20collectible&width=400&height=400&seq=prod-vegeta-001&orientation=squarish',
-        sizes: [
-          { size: '5cm', price: 19000 },
-          { size: '10cm', price: 24000 },
-          { size: '15cm', price: 29000 },
-          { size: '20cm', price: 34000 },
-          { size: '25cm', price: 39000 }
-        ],
-        complexity: 'Alta',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 6,
-        name: 'Batman Dark Knight',
-        basePrice: 30000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20Batman%20Dark%20Knight%20figure%2C%20black%20cape%2C%20detailed%20armor%2C%20dramatic%20pose%2C%20DC%20Comics%20collectible%2C%20premium%20finish&width=400&height=400&seq=prod-batman-001&orientation=squarish',
-        sizes: [
-          { size: '10cm', price: 30000 },
-          { size: '15cm', price: 35000 },
-          { size: '20cm', price: 40000 },
-          { size: '25cm', price: 45000 }
-        ],
-        complexity: 'Muy Alta',
-        stock: 'Archivo disponible'
-      }
-    ]
+    heroImage: 'https://readdy.ai/api/search-image?query=Professional%20display%20of%20detailed%203D%20printed%20character%20figures%20including%20anime%20heroes%2C%20superheroes%2C%20and%20action%20figures%2C%20premium%20resin%20quality%2C%20dramatic%20lighting%2C%20collector%20showcase%2C%20museum%20quality%20presentation&width=1200&height=600&seq=hero-personajes-001&orientation=landscape'
   },
   mascotas: {
-    title: 'Mascotas',
     emoji: '🐕',
-    description: 'Réplicas exactas y emotivas de tu compañero fiel',
-    heroImage: 'https://readdy.ai/api/search-image?query=Heartwarming%20collection%20of%20custom%203D%20printed%20pet%20figurines%2C%20dogs%20and%20cats%20in%20various%20poses%2C%20realistic%20details%2C%20memorial%20quality%2C%20emotional%20connection%2C%20professional%20pet%20photography%20style&width=1200&height=600&seq=hero-mascotas-001&orientation=landscape',
-    products: [
-      {
-        id: 1,
-        name: 'Golden Retriever Genérico',
-        basePrice: 28000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20Golden%20Retriever%20figurine%2C%20sitting%20pose%2C%20realistic%20fur%20texture%2C%20loving%20expression%2C%20generic%20breed%20model%2C%20quality%20pet%20replica&width=400&height=400&seq=prod-golden-gen-001&orientation=squarish',
-        sizes: [
-          { size: '5cm', price: 23000 },
-          { size: '10cm', price: 28000 },
-          { size: '15cm', price: 33000 },
-          { size: '20cm', price: 38000 },
-          { size: '25cm', price: 43000 }
-        ],
-        complexity: 'Media',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 2,
-        name: 'Gato Persa Genérico',
-        basePrice: 26000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20Persian%20cat%20figurine%2C%20fluffy%20fur%20details%2C%20elegant%20pose%2C%20realistic%20facial%20features%2C%20generic%20breed%20model%2C%20premium%20quality&width=400&height=400&seq=prod-persian-gen-001&orientation=squarish',
-        sizes: [
-          { size: '5cm', price: 21000 },
-          { size: '10cm', price: 26000 },
-          { size: '15cm', price: 31000 },
-          { size: '20cm', price: 36000 },
-          { size: '25cm', price: 41000 }
-        ],
-        complexity: 'Media',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 3,
-        name: 'Bulldog Francés Genérico',
-        basePrice: 25000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20French%20Bulldog%20figurine%2C%20characteristic%20wrinkles%2C%20playful%20expression%2C%20detailed%20breed%20features%2C%20generic%20breed%20model&width=400&height=400&seq=prod-bulldog-gen-001&orientation=squarish',
-        sizes: [
-          { size: '5cm', price: 20000 },
-          { size: '10cm', price: 25000 },
-          { size: '15cm', price: 30000 },
-          { size: '20cm', price: 35000 },
-          { size: '25cm', price: 40000 }
-        ],
-        complexity: 'Media',
-        stock: 'Archivo disponible'
-      }
-    ]
+    heroImage: 'https://readdy.ai/api/search-image?query=Heartwarming%20collection%20of%20custom%203D%20printed%20pet%20figurines%2C%20dogs%20and%20cats%20in%20various%20poses%2C%20realistic%20details%2C%20memorial%20quality%2C%20emotional%20connection%2C%20professional%20pet%20photography%20style&width=1200&height=600&seq=hero-mascotas-001&orientation=landscape'
   },
   gaming: {
-    title: 'Gaming',
     emoji: '🎮',
-    description: 'Personajes icónicos de videojuegos y mundos virtuales',
-    heroImage: 'https://readdy.ai/api/search-image?query=Epic%20gaming%20character%20figures%20collection%2C%20video%20game%20heroes%2C%20detailed%203D%20printed%20miniatures%2C%20gaming%20culture%20showcase%2C%20collector%20quality%2C%20dramatic%20lighting%2C%20modern%20gaming%20aesthetic&width=1200&height=600&seq=hero-gaming-001&orientation=landscape',
-    products: [
-      {
-        id: 1,
-        name: 'Master Chief Halo',
-        basePrice: 32000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20Master%20Chief%20figure%20from%20Halo%2C%20detailed%20armor%2C%20iconic%20helmet%2C%20military%20pose%2C%20gaming%20collectible%2C%20high%20quality%20finish&width=400&height=400&seq=prod-chief-001&orientation=squarish',
-        sizes: [
-          { size: '10cm', price: 32000 },
-          { size: '15cm', price: 37000 },
-          { size: '20cm', price: 42000 },
-          { size: '25cm', price: 47000 }
-        ],
-        complexity: 'Muy Alta',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 2,
-        name: 'Kratos God of War',
-        basePrice: 35000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20Kratos%20figure%2C%20Norse%20mythology%20version%2C%20detailed%20tattoos%2C%20axe%20weapon%2C%20muscular%20build%2C%20God%20of%20War%20collectible&width=400&height=400&seq=prod-kratos-001&orientation=squarish',
-        sizes: [
-          { size: '10cm', price: 35000 },
-          { size: '15cm', price: 40000 },
-          { size: '20cm', price: 45000 },
-          { size: '25cm', price: 50000 }
-        ],
-        complexity: 'Muy Alta',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 3,
-        name: 'Link Breath of Wild',
-        basePrice: 27000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20Link%20figure%20from%20Zelda%20Breath%20of%20the%20Wild%2C%20detailed%20clothing%2C%20master%20sword%2C%20heroic%20pose%2C%20Nintendo%20collectible&width=400&height=400&seq=prod-link-001&orientation=squarish',
-        sizes: [
-          { size: '5cm', price: 22000 },
-          { size: '10cm', price: 27000 },
-          { size: '15cm', price: 32000 },
-          { size: '20cm', price: 37000 },
-          { size: '25cm', price: 42000 }
-        ],
-        complexity: 'Alta',
-        stock: 'Archivo disponible'
-      }
-    ]
+    heroImage: 'https://readdy.ai/api/search-image?query=Epic%20gaming%20character%20figures%20collection%2C%20video%20game%20heroes%2C%20detailed%203D%20printed%20miniatures%2C%20gaming%20culture%20showcase%2C%20collector%20quality%2C%20dramatic%20lighting%2C%20modern%20gaming%20aesthetic&width=1200&height=600&seq=hero-gaming-001&orientation=landscape'
   },
   marcos: {
-    title: 'Marcos',
     emoji: '🖼️',
-    description: 'Marcos decorativos únicos y personalizados',
-    heroImage: 'https://readdy.ai/api/search-image?query=Elegant%20collection%20of%20custom%203D%20printed%20decorative%20frames%20with%20intricate%20patterns%20and%20designs%2C%20modern%20home%20decor%2C%20sophisticated%20craftsmanship%2C%20premium%20quality%20finish%2C%20artistic%20display&width=1200&height=600&seq=hero-marcos-001&orientation=landscape',
-    products: [
-      {
-        id: 1,
-        name: 'Marco Ornamental Clásico',
-        basePrice: 18000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20ornamental%20classic%20picture%20frame%20with%20elegant%20baroque%20details%2C%20decorative%20patterns%2C%20premium%20white%20finish%2C%20sophisticated%20home%20decor&width=400&height=400&seq=prod-marco-classic-001&orientation=squarish',
-        sizes: [
-          { size: '10x15cm', price: 18000 },
-          { size: '15x20cm', price: 22000 },
-          { size: '20x25cm', price: 28000 },
-          { size: '25x30cm', price: 35000 }
-        ],
-        complexity: 'Media',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 2,
-        name: 'Marco Minimalista Moderno',
-        basePrice: 15000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20minimalist%20modern%20picture%20frame%2C%20clean%20lines%2C%20geometric%20design%2C%20contemporary%20home%20decor%2C%20sleek%20finish&width=400&height=400&seq=prod-marco-modern-001&orientation=squarish',
-        sizes: [
-          { size: '10x15cm', price: 15000 },
-          { size: '15x20cm', price: 19000 },
-          { size: '20x25cm', price: 24000 },
-          { size: '25x30cm', price: 30000 }
-        ],
-        complexity: 'Baja',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 3,
-        name: 'Marco Temático Infantil',
-        basePrice: 20000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20children%20themed%20picture%20frame%20with%20playful%20decorative%20elements%2C%20colorful%20design%2C%20cartoon%20style%2C%20kids%20room%20decor&width=400&height=400&seq=prod-marco-kids-001&orientation=squarish',
-        sizes: [
-          { size: '10x15cm', price: 20000 },
-          { size: '15x20cm', price: 25000 },
-          { size: '20x25cm', price: 30000 }
-        ],
-        complexity: 'Media',
-        stock: 'Archivo disponible'
-      }
-    ]
+    heroImage: 'https://readdy.ai/api/search-image?query=Elegant%20collection%20of%20custom%203D%20printed%20decorative%20frames%20with%20intricate%20patterns%20and%20designs%2C%20modern%20home%20decor%2C%20sophisticated%20craftsmanship%2C%20premium%20quality%20finish%2C%20artistic%20display&width=1200&height=600&seq=hero-marcos-001&orientation=landscape'
   },
   vehiculos: {
-    title: 'Vehículos',
     emoji: '🚗',
-    description: 'Modelos a escala perfectos de vehículos icónicos',
-    heroImage: 'https://readdy.ai/api/search-image?query=Professional%20display%20of%20detailed%203D%20printed%20scale%20model%20vehicles%2C%20classic%20cars%2C%20sports%20cars%2C%20and%20motorcycles%2C%20collector%20quality%2C%20precision%20engineering%2C%20automotive%20miniatures%20showcase&width=1200&height=600&seq=hero-vehiculos-001&orientation=landscape',
-    products: [
-      {
-        id: 1,
-        name: 'Ferrari F40 Clásico',
-        basePrice: 35000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20Ferrari%20F40%20scale%20model%2C%20red%20sports%20car%2C%20detailed%20body%20work%2C%20collector%20quality%20automotive%20miniature%2C%20precision%20craftsmanship&width=400&height=400&seq=prod-ferrari-001&orientation=squarish',
-        sizes: [
-          { size: '1:64', price: 25000 },
-          { size: '1:43', price: 35000 },
-          { size: '1:24', price: 50000 },
-          { size: '1:18', price: 75000 }
-        ],
-        complexity: 'Alta',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 2,
-        name: 'Volkswagen Beetle Vintage',
-        basePrice: 28000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20Volkswagen%20Beetle%20vintage%20scale%20model%2C%20classic%20car%20design%2C%20detailed%20craftsmanship%2C%20retro%20automotive%20collectible&width=400&height=400&seq=prod-beetle-001&orientation=squarish',
-        sizes: [
-          { size: '1:64', price: 20000 },
-          { size: '1:43', price: 28000 },
-          { size: '1:24', price: 40000 },
-          { size: '1:18', price: 60000 }
-        ],
-        complexity: 'Media',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 3,
-        name: 'Harley Davidson Motorcycle',
-        basePrice: 32000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20Harley%20Davidson%20motorcycle%20scale%20model%2C%20detailed%20bike%20replica%2C%20precision%20engineering%2C%20motorcycle%20collectible%20miniature&width=400&height=400&seq=prod-harley-001&orientation=squarish',
-        sizes: [
-          { size: '1:64', price: 22000 },
-          { size: '1:43', price: 32000 },
-          { size: '1:24', price: 45000 },
-          { size: '1:18', price: 65000 }
-        ],
-        complexity: 'Alta',
-        stock: 'Archivo disponible'
-      }
-    ]
+    heroImage: 'https://readdy.ai/api/search-image?query=Professional%20display%20of%20detailed%203D%20printed%20scale%20model%20vehicles%2C%20classic%20cars%2C%20sports%20cars%2C%20and%20motorcycles%2C%20collector%20quality%2C%20precision%20engineering%2C%20automotive%20miniatures%20showcase&width=1200&height=600&seq=hero-vehiculos-001&orientation=landscape'
   },
   maqueteria: {
-    title: 'Maquetería',
     emoji: '🏗️',
-    description: 'Arquitectura y construcciones detalladas',
-    heroImage: 'https://readdy.ai/api/search-image?query=Professional%20architectural%20scale%20models%20and%20building%20miniatures%2C%20detailed%20construction%20replicas%2C%20precision%20crafted%20structures%2C%20modern%20and%20classic%20architecture%20showcase&width=1200&height=600&seq=hero-maqueteria-001&orientation=landscape',
-    products: [
-      {
-        id: 1,
-        name: 'Casa Moderna Minimalista',
-        basePrice: 45000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20modern%20minimalist%20house%20scale%20model%2C%20contemporary%20architecture%2C%20clean%20lines%2C%20detailed%20construction%2C%20architectural%20miniature&width=400&height=400&seq=prod-casa-moderna-001&orientation=squarish',
-        sizes: [
-          { size: '1:100', price: 35000 },
-          { size: '1:75', price: 45000 },
-          { size: '1:50', price: 65000 },
-          { size: '1:25', price: 95000 }
-        ],
-        complexity: 'Alta',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 2,
-        name: 'Torre Eiffel Replica',
-        basePrice: 40000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20Eiffel%20Tower%20scale%20model%20replica%2C%20detailed%20iron%20structure%2C%20architectural%20landmark%2C%20precision%20crafted%20monument%20miniature&width=400&height=400&seq=prod-eiffel-001&orientation=squarish',
-        sizes: [
-          { size: '15cm', price: 25000 },
-          { size: '25cm', price: 40000 },
-          { size: '35cm', price: 60000 },
-          { size: '50cm', price: 85000 }
-        ],
-        complexity: 'Muy Alta',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 3,
-        name: 'Puente Golden Gate',
-        basePrice: 50000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20Golden%20Gate%20Bridge%20scale%20model%2C%20detailed%20suspension%20bridge%20structure%2C%20architectural%20engineering%20replica%2C%20landmark%20miniature&width=400&height=400&seq=prod-golden-gate-001&orientation=squarish',
-        sizes: [
-          { size: '30cm', price: 50000 },
-          { size: '50cm', price: 75000 },
-          { size: '75cm', price: 110000 }
-        ],
-        complexity: 'Muy Alta',
-        stock: 'Archivo disponible'
-      }
-    ]
+    heroImage: 'https://readdy.ai/api/search-image?query=Professional%20architectural%20scale%20models%20and%20building%20miniatures%2C%20detailed%20construction%20replicas%2C%20precision%20crafted%20structures%2C%20modern%20and%20classic%20architecture%20showcase&width=1200&height=600&seq=hero-maqueteria-001&orientation=landscape'
   },
   lamparas: {
-    title: 'Lámparas',
     emoji: '💡',
-    description: 'Iluminación artística personalizada y única',
-    heroImage: 'https://readdy.ai/api/search-image?query=Collection%20of%20custom%203D%20printed%20artistic%20lamps%20and%20lighting%20fixtures%2C%20modern%20design%2C%20creative%20illumination%2C%20contemporary%20home%20decor%2C%20elegant%20lighting%20solutions&width=1200&height=600&seq=hero-lamparas-001&orientation=landscape',
-    products: [
-      {
-        id: 1,
-        name: 'Lámpara Geométrica Moderna',
-        basePrice: 38000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20geometric%20modern%20lamp%20with%20intricate%20pattern%20design%2C%20contemporary%20lighting%20fixture%2C%20artistic%20home%20decor%2C%20elegant%20illumination&width=400&height=400&seq=prod-lamp-geometric-001&orientation=squarish',
-        sizes: [
-          { size: '20cm', price: 30000 },
-          { size: '30cm', price: 38000 },
-          { size: '40cm', price: 50000 },
-          { size: '50cm', price: 65000 }
-        ],
-        complexity: 'Alta',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 2,
-        name: 'Lámpara Luna Realista',
-        basePrice: 42000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20realistic%20moon%20lamp%20with%20detailed%20lunar%20surface%20texture%2C%20ambient%20lighting%2C%20space%20themed%20decor%2C%20night%20light&width=400&height=400&seq=prod-lamp-moon-001&orientation=squarish',
-        sizes: [
-          { size: '15cm', price: 35000 },
-          { size: '20cm', price: 42000 },
-          { size: '25cm', price: 55000 },
-          { size: '30cm', price: 70000 }
-        ],
-        complexity: 'Media',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 3,
-        name: 'Lámpara Floral Artística',
-        basePrice: 45000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20artistic%20floral%20lamp%20with%20delicate%20flower%20patterns%2C%20organic%20design%2C%20decorative%20lighting%2C%20botanical%20home%20decor&width=400&height=400&seq=prod-lamp-floral-001&orientation=squarish',
-        sizes: [
-          { size: '25cm', price: 40000 },
-          { size: '35cm', price: 45000 },
-          { size: '45cm', price: 60000 }
-        ],
-        complexity: 'Alta',
-        stock: 'Archivo disponible'
-      }
-    ]
+    heroImage: 'https://readdy.ai/api/search-image?query=Collection%20of%20custom%203D%20printed%20artistic%20lamps%20and%20lighting%20fixtures%2C%20modern%20design%2C%20creative%20illumination%2C%20contemporary%20home%20decor%2C%20elegant%20lighting%20solutions&width=1200&height=600&seq=hero-lamparas-001&orientation=landscape'
   },
   prototipos: {
-    title: 'Prototipos',
     emoji: '⚙️',
-    description: 'Desarrollo de productos y prototipos funcionales',
-    heroImage: 'https://readdy.ai/api/search-image?query=Professional%203D%20printed%20prototypes%20and%20product%20development%20models%2C%20engineering%20precision%2C%20industrial%20design%2C%20technical%20accuracy%2C%20modern%20manufacturing%20showcase&width=1200&height=600&seq=hero-prototipos-001&orientation=landscape',
-    products: [
-      {
-        id: 1,
-        name: 'Prototipo Funcional Básico',
-        basePrice: 25000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20basic%20functional%20prototype%20model%2C%20engineering%20design%2C%20product%20development%2C%20technical%20precision%2C%20industrial%20quality&width=400&height=400&seq=prod-proto-basic-001&orientation=squarish',
-        sizes: [
-          { size: 'Pequeño', price: 25000 },
-          { size: 'Mediano', price: 40000 },
-          { size: 'Grande', price: 60000 }
-        ],
-        complexity: 'Media',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 2,
-        name: 'Engranajes y Mecanismos',
-        basePrice: 35000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20gears%20and%20mechanical%20components%2C%20precision%20engineering%2C%20functional%20mechanisms%2C%20technical%20parts%2C%20industrial%20prototyping&width=400&height=400&seq=prod-gears-001&orientation=squarish',
-        sizes: [
-          { size: 'Set Básico', price: 30000 },
-          { size: 'Set Completo', price: 35000 },
-          { size: 'Set Avanzado', price: 50000 }
-        ],
-        complexity: 'Alta',
-        stock: 'Archivo disponible'
-      },
-      {
-        id: 3,
-        name: 'Carcasa Electrónica',
-        basePrice: 28000,
-        image: 'https://readdy.ai/api/search-image?query=3D%20printed%20electronic%20enclosure%20prototype%2C%20device%20housing%2C%20technical%20precision%2C%20product%20development%2C%20industrial%20design&width=400&height=400&seq=prod-enclosure-001&orientation=squarish',
-        sizes: [
-          { size: '5x5cm', price: 20000 },
-          { size: '10x10cm', price: 28000 },
-          { size: '15x15cm', price: 40000 },
-          { size: '20x20cm', price: 55000 }
-        ],
-        complexity: 'Media',
-        stock: 'Archivo disponible'
-      }
-    ]
+    heroImage: 'https://readdy.ai/api/search-image?query=Professional%203D%20printed%20prototypes%20and%20product%20development%20models%2C%20engineering%20precision%2C%20industrial%20design%2C%20technical%20accuracy%2C%20modern%20manufacturing%20showcase&width=1200&height=600&seq=hero-prototipos-001&orientation=landscape'
   }
 };
 
 export default function CategoryDetail({ categorySlug }: { categorySlug: string }) {
   const { addItem } = useCart();
+  const [products, setProducts] = useState<any[]>([]);
+  const [categoryInfo, setCategoryInfo] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedFinish, setSelectedFinish] = useState('Color base');
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const category = categoryData[categorySlug as keyof typeof categoryData];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        // 1. Fetch products filtered by category
+        const productsRes = await fetch(`http://localhost:4001/products?category=${categorySlug}`);
+        if (productsRes.ok) {
+          const productsData = await productsRes.json();
+          // Map backend product structure to frontend expectations if needed
+          // Backend has: name, price, size, finish, imageUrl
+          // Frontend expects: name, image, sizes array (mocking sizes for now based on single size), basePrice
+          const mappedProducts = productsData.map((p: any) => ({
+            id: p._id,
+            name: p.name,
+            image: p.imageUrl,
+            basePrice: p.price,
+            stock: p.stock > 0 ? 'En Stock' : 'A pedido',
+            complexity: 'Media', // Default
+            sizes: [
+              { size: p.size || 'Estándar', price: p.price }
+            ],
+            description: p.description
+          }));
+          setProducts(mappedProducts);
+        }
 
-  if (!category) {
-    return <div>Categoría no encontrada</div>;
-  }
+        // 2. Fetch category details (for title/desc) or use metadata fallback
+        const meta = categoryMetadata[categorySlug] || {};
+
+        // Try getting category info from backend API if exists
+        try {
+          const categoriesRes = await fetch('http://localhost:4001/categories');
+          if (categoriesRes.ok) {
+            const categoriesData = await categoriesRes.json();
+            const foundCat = categoriesData.find((c: any) => c.slug === categorySlug);
+            if (foundCat) {
+              setCategoryInfo({
+                title: foundCat.name,
+                emoji: foundCat.emoji,
+                description: foundCat.description,
+                heroImage: foundCat.image || meta.heroImage // User DB image or fallback
+              });
+              return;
+            }
+          }
+        } catch (e) { console.error('Error fetching categories list:', e); }
+
+        // Fallback to metadata if DB fetch fails or category not found
+        setCategoryInfo({
+          title: categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1),
+          emoji: meta.emoji || '📦',
+          description: `Explora nuestra colección de ${categorySlug}`,
+          heroImage: meta.heroImage || 'https://via.placeholder.com/1200x600'
+        });
+
+      } catch (error) {
+        console.error('Error loading category data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [categorySlug]);
+
+  if (loading) return <div className="p-10 text-center">Cargando productos...</div>;
+  if (!categoryInfo) return <div className="p-10 text-center">Categoría no encontrada</div>;
+
+  const category = {
+    ...categoryInfo,
+    products: products
+  };
 
   const openProductModal = (product: any) => {
     setSelectedProduct(product);
@@ -537,7 +207,7 @@ export default function CategoryDetail({ categorySlug }: { categorySlug: string 
 
       {/* Hero Section */}
       <section
-        className="relative h-64 sm:h-80 md:h-96 bg-cover bg-center flex items-center justify-center"
+        className="relative h-[220px] bg-cover bg-center flex items-center justify-center"
         style={{
           backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${category.heroImage}')`
         }}
