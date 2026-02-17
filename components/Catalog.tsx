@@ -21,7 +21,15 @@ export default function Catalog() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch('http://localhost:4001/categories');
+        const apiUrl = process.env.NEXT_PUBLIC_API_PRODUCTS;
+        console.log('API URL:', apiUrl);
+
+        if (!apiUrl) {
+          console.error('Environment variable NEXT_PUBLIC_API_PRODUCTS is not defined');
+          throw new Error('API URL is missing');
+        }
+
+        const res = await fetch(`${apiUrl}/categories`);
         if (res.ok) {
           const data = await res.json();
           setCategories(data);
