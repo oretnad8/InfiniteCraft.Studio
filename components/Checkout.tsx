@@ -2,15 +2,7 @@
 
 import { useState } from 'react';
 
-interface CartItem {
-  id: string;
-  name: string;
-  size: string;
-  finish: string;
-  price: number;
-  quantity: number;
-  type: 'stock' | 'custom';
-}
+import { CartItem } from '@/types';
 
 interface CheckoutProps {
   isOpen: boolean;
@@ -59,21 +51,72 @@ export default function Checkout({ isOpen, onClose, items, total, onOrderComplet
     }
   };
 
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const handleSubmitOrder = async () => {
     setIsProcessing(true);
-    
-    // Simular procesamiento de pago
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    setIsProcessing(false);
-    setOrderComplete(true);
-    
-    setTimeout(() => {
-      onOrderComplete();
-      onClose();
-      setStep(1);
-      setOrderComplete(false);
-    }, 3000);
+
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('customer', JSON.stringify(formData));
+
+      // Prepare items, stripping out large base64 images from JSON to keep payload clean
+      // The images will be sent as files and referenced in the backend logic if needed
+      // Logic: Extract base64 images from custom items and append as files.
+      // Note: Since we are storing base64 in the cart for preview (implied from previous steps/context),
+      // we need to convert them back to blobs to upload as files.
+
+      const itemsForPayload = items.map(item => {
+        const { images, ...rest } = item;
+        // logic to strip images from the JSON payload if they are large base64 strings
+        // Return item without the heavy image data, backend will map uploaded files
+        return rest;
+      });
+
+      formDataToSend.append('items', JSON.stringify(itemsForPayload));
+      formDataToSend.append('totalAmount', total.toString());
+
+      // Append files
+      // We need to iterate over items and find images to upload
+      // For this MVP, we will iterate over all items and if they have 'images' (base64/dataurl), append them.
+
+      for (const item of items) {
+        if (item.type === 'custom' && item.images && item.images.length > 0) {
+          for (const imgDataUrl of item.images) {
+            if (imgDataUrl.startsWith('data:')) {
+              // Convert Base64 to Blob
+              const res = await fetch(imgDataUrl);
+              const blob = await res.blob();
+              // Append with a generic name, backend handles uniqueness
+              formDataToSend.append('images', blob, `custom-item-${item.id}.jpg`);
+            }
+          }
+        }
+      }
+
+      const response = await fetch('http://localhost:4000/api/orders', {
+        method: 'POST',
+        body: formDataToSend, // Do not set Content-Type header, let browser set it with boundary
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al procesar el pedido');
+      }
+
+      setOrderComplete(true);
+
+      setTimeout(() => {
+        onOrderComplete(); // Clears cart
+        onClose();
+        setStep(1);
+        setOrderComplete(false);
+      }, 3000);
+
+    } catch (error) {
+      console.error('Error submitting order:', error);
+      alert('Hubo un error al procesar tu pedido. Por favor intenta nuevamente.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -102,7 +145,7 @@ export default function Checkout({ isOpen, onClose, items, total, onOrderComplet
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b">
               <h2 className="text-2xl font-bold text-gray-900">Finalizar Compra</h2>
-              <button 
+              <button
                 onClick={onClose}
                 className="text-gray-500 hover:text-gray-700 cursor-pointer"
               >
@@ -115,9 +158,8 @@ export default function Checkout({ isOpen, onClose, items, total, onOrderComplet
               <div className="flex items-center justify-between">
                 {[1, 2, 3].map((stepNum) => (
                   <div key={stepNum} className="flex items-center">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold $${
-                      step >= stepNum ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-600'
-                    }`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold $${step >= stepNum ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-600'
+                      }`}>
                       {stepNum}
                     </div>
                     <span className={`ml-2 text-sm $${step >= stepNum ? 'text-red-600' : 'text-gray-500'}`}>
@@ -272,7 +314,7 @@ export default function Checkout({ isOpen, onClose, items, total, onOrderComplet
                 >
                   {step === 1 ? 'Cancelar' : 'Anterior'}
                 </button>
-                
+
                 {step < 3 ? (
                   <button
                     onClick={handleNextStep}

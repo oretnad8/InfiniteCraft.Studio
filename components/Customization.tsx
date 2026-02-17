@@ -41,20 +41,32 @@ export default function Customization() {
     }
   };
 
-  const handleAddToCart = () => {
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const handleAddToCart = async () => {
     if (uploadedFiles.length === 0) {
       alert('Por favor sube al menos una foto de referencia para continuar');
       return;
     }
 
-    const cartItem = {
+    // Convert files to Base64
+    const imagesBase64 = await Promise.all(uploadedFiles.map(file => {
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }));
+
+    const cartItem: any = { // Using any temporarily to avoid strict type checks against the generic CartItem if context types aren't fully updated yet, but aiming to match the new interface
       id: `custom-${Date.now()}`,
       name: 'Figura Personalizada',
       size: selectedSize,
       finish: selectedFinish,
       price: calculatePrice(),
-      type: 'custom' as const,
-      category: 'personalizada'
+      type: 'custom',
+      category: 'personalizada',
+      images: imagesBase64
     };
 
     addItem(cartItem);
