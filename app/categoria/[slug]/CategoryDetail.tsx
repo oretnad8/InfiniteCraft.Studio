@@ -5,6 +5,22 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '../../../hooks/useCart';
 
+interface ProductSize {
+  size: string;
+  price: number;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  image: string;
+  basePrice: number;
+  stock: string;
+  complexity: string;
+  sizes: ProductSize[];
+  description: string;
+}
+
 // Hardcoded hero images for categories (fallback or enhancement)
 const categoryHeroImages: Record<string, string> = {
   personajes: 'https://readdy.ai/api/search-image?query=Professional%20display%20of%20detailed%203D%20printed%20character%20figures%20including%20anime%20heroes%2C%20superheroes%2C%20and%20action%20figures%2C%20premium%20resin%20quality%2C%20dramatic%20lighting%2C%20collector%20showcase%2C%20museum%20quality%20presentation&width=1200&height=600&seq=hero-personajes-001&orientation=landscape',
@@ -55,11 +71,11 @@ const categoryMetadata: Record<string, { heroImage: string, emoji: string, title
 
 export default function CategoryDetail({ categorySlug }: { categorySlug: string }) {
   const { addItem } = useCart();
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [categoryInfo, setCategoryInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedFinish, setSelectedFinish] = useState('Color base');
@@ -138,7 +154,7 @@ export default function CategoryDetail({ categorySlug }: { categorySlug: string 
     products: products
   };
 
-  const openProductModal = (product: any) => {
+  const openProductModal = (product: Product) => {
     setSelectedProduct(product);
     setSelectedSize(product.sizes[1]?.size || product.sizes[0]?.size);
     setSelectedFinish('Color base');
@@ -154,7 +170,7 @@ export default function CategoryDetail({ categorySlug }: { categorySlug: string 
 
   const getCurrentPrice = () => {
     if (!selectedProduct || !selectedSize) return 0;
-    const sizePrice = selectedProduct.sizes.find((s: any) => s.size === selectedSize)?.price || 0;
+    const sizePrice = selectedProduct.sizes.find((s: ProductSize) => s.size === selectedSize)?.price || 0;
     const multiplier = selectedFinish === 'Pintado a mano' ? 1.3 : 1;
     return Math.round(sizePrice * multiplier);
   };
@@ -243,7 +259,7 @@ export default function CategoryDetail({ categorySlug }: { categorySlug: string 
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {category.products.map((product) => (
+            {category.products.map((product: Product) => (
               <div key={product.id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
                 <img
                   src={product.image}
@@ -259,7 +275,7 @@ export default function CategoryDetail({ categorySlug }: { categorySlug: string 
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1 sm:gap-2 mb-4">
-                    {product.sizes.map((sizeOption) => (
+                    {product.sizes.map((sizeOption: ProductSize) => (
                       <span key={sizeOption.size} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs sm:text-sm">
                         {sizeOption.size}: ${sizeOption.price.toLocaleString()}
                       </span>
