@@ -6,12 +6,16 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const Order = require('./models/Order');
+const { MercadoPagoConfig, Preference } = require('mercadopago');
+
+// MercadoPago Configuration
+const client = new MercadoPagoConfig({ accessToken: 'APP_USR-4356966745485069-122518-52735972443ea633844585ceaa5b4259-140267706' });
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Middleware
-app.use(cors());
+app.use(cors()); // Allow all for now, or restrict as per previous steps
 app.use(express.json());
 // Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -45,6 +49,41 @@ mongoose.connect('mongodb://localhost:27017/infinitecraft_orders', {
     .catch(err => console.error('MongoDB Connection Error:', err));
 
 // Routes
+
+// POST /api/create_preference - Create MercadoPago preference
+app.post('/api/create_preference', async (req, res) => {
+    try {
+        const { items, external_reference } = req.body;
+
+        // Map items to MercadoPago format
+        const mpItems = items.map(item => ({
+            title: item.name,
+            quantity: Number(item.quantity),
+            unit_price: Number(item.price),
+            currency_id: 'CLP'
+        }));
+
+        const preference = new Preference(client);
+
+        const result = await preference.create({
+            body: {
+                items: mpItems,
+                external_reference: external_reference, // To link with our order ID
+                back_urls: {
+                    success: "https://8craft-studio.vercel.app/checkout/success",
+                    failure: "https://8craft-studio.vercel.app/checkout/failure",
+                    pending: "https://8craft-studio.vercel.app/checkout/pending"
+                },
+                auto_return: "approved",
+            }
+        });
+
+        res.json({ id: result.id, init_point: result.init_point });
+    } catch (error) {
+        console.error('Error creating preference:', error);
+        res.status(500).json({ message: 'Error creating payment preference' });
+    }
+});
 
 // GET /api/orders - List pending (and other) orders
 app.get('/api/orders', async (req, res) => {

@@ -1,0 +1,22 @@
+{
+	# Reemplaza 'tu-dominio-ddns.net' con tu dominio real (ej: midominio.ddns.net)
+	# Caddy obtendrá automáticamente el certificado SSL para este dominio.
+	email or.etnad8@gmail.com
+}
+
+dantero.ddns.net {
+	# Orders Service
+	reverse_proxy /api/orders* localhost:4000
+	reverse_proxy /uploads* localhost:4000
+
+	# Products Service
+	reverse_proxy /products* localhost:4001
+	reverse_proxy /categories* localhost:4001
+
+	# Configuración adicional para CORS (por seguridad, aunque ya lo tienes en express)
+	header {
+		Access-Control-Allow-Origin "https://8craft-studio.vercel.app"
+		Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+		Access-Control-Allow-Headers "Content-Type, Authorization"
+	}
+}
