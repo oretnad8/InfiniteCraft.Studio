@@ -9,7 +9,7 @@ const Order = require('./models/Order');
 const { MercadoPagoConfig, Preference } = require('mercadopago');
 
 // MercadoPago Configuration
-const client = new MercadoPagoConfig({ accessToken: 'APP_USR-4356966745485069-122518-52735972443ea633844585ceaa5b4259-140267706' });
+const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -41,7 +41,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Database Connection
-mongoose.connect('mongodb://localhost:27017/infinitecraft_orders', {
+mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
@@ -70,9 +70,9 @@ app.post('/api/create_preference', async (req, res) => {
                 items: mpItems,
                 external_reference: external_reference, // To link with our order ID
                 back_urls: {
-                    success: "https://8craft-studio.vercel.app/checkout/success",
-                    failure: "https://8craft-studio.vercel.app/checkout/failure",
-                    pending: "https://8craft-studio.vercel.app/checkout/pending"
+                    success: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success`,
+                    failure: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/failure`,
+                    pending: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/pending`
                 },
                 auto_return: "approved",
             }

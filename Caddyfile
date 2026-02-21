@@ -13,10 +13,4 @@ dantero.ddns.net {
 	reverse_proxy /products* localhost:4001
 	reverse_proxy /categories* localhost:4001
 
-	# Configuración adicional para CORS (por seguridad, aunque ya lo tienes en express)
-	header {
-		Access-Control-Allow-Origin "https://8craft-studio.vercel.app"
-		Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-		Access-Control-Allow-Headers "Content-Type, Authorization"
-	}
 }
